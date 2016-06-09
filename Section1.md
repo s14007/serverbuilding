@@ -9,6 +9,8 @@ VirtualBox上にインストールしてください。
 
 VirtualBoxで作成する仮想マシンのメモリのサイズは1GBにします。また、ストレージの容量は8GB程度に設定してください。
 
+作成したらNetWorkを追加するので File → Preferences → Network → Host-only Networks でAddする。
+
 ネットワークアダプター2を設定します。割り当てを「ホストオンリーアダプター」にします。
 (ネットワークアダプター1はデフォルト(NAT)で問題ありません)
 
