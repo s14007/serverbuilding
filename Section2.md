@@ -91,7 +91,89 @@ Vagrantfileで変更した設定を反映させるには
 Nginxはディストリビューターからrpmが提供されていないため、リポジトリを追加する必要があります。
 [公式サイト](http://nginx.org/en/linux_packages.html#stable)からリポジトリ追加用のrpmをダウンロードしてインストールしてください。
 
-その後yumでインストールできるようになります。
+
+###Nginx
+- Nginxのインストール
+
+    sudo yum -y install http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+
+- パッケージのインストール
+
+    sudo yum install --enablerepo=nginx nginx
+
+- 設定  
+設定してねっ！
+
+    /etc/nginx/conf.d/default.conf
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        root     /var/www/wordpress/;
+
+        #charset koi8-r;
+        access_log  /var/log/nginx/wp-access_log  main;
+        error_log   /var/log/nginx/wp-error_log;
+
+        location / {
+        alias /var/www/wordpress/;
+            index index.php index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        #error_page   500 502 503 504  /50x.html;
+        #location = /50x.html {
+        #    root   /usr/share/nginx/html;
+        #}
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://172.168.40.1:8888;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        location ~ \.php$ {
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include        fastcgi_params;
+        }
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+###mariadb
+- mariadbを起動する。
+
+    sudo systemctl start mariadb
+
+- mariadbを自動起動
+
+    sudo systemctl enable mariadb
+
+###php
+- php
+
+    yum install --enablerepo=epel,remi-php70 php php-mbstring php-pear php-fpm php-mcrypt php-mysql
+
+起動
+
+    sudo systemctl start php-fpm
+
+再起
+    
+    sudo systemctl restart php-fpm
 
 NginxでPHPを動かすにはコツが必要ですのでがんばって検索して動かしてください。
 ヒントは **Nginx php-fpm** です。
@@ -111,21 +193,33 @@ Apache HTTP Server 2.2とPHP7.0の環境を構築し、Wordpressを動かして�
 
 その時は別のVagrantfile(作業ディレクトリ)を作ってやってくださいね。
 
+apache  
+[Document varsion2.2](https://httpd.apache.org/docs/2.2/install.html)
+
+[Download varsion2.2](http://ftp.riken.jp/net/apache//httpd/httpd-2.2.31.tar.gz)
+
+起動  
+
+    /usr/local/apache2/bin/apachectl start
+
+再起
+
+  ｋ  /usr/local/apache2/bin/apachectl restart
+
+phpで最後詰んだので
+
+[phpDocument](https://secure.php.net/manual/ja/install.unix.apache2.php)
+
+***Documentここだけ違うよっ( ^ω^ )ﾆｺﾆｺ***
+
+    ./configure --with-apxs2=/usr/local/apache2/bin/apxs --with-mysqli
+
 ## 2-4 ベンチマークを取る
 
 サーバーの性能測定のためにベンチマークを取ることがあります。
 
 [別ページ](misc/Benchmark.md)にまとめてありますのでそちらを参照してください。
 
-## 2-5 セキュリティチェック
+abコマンドをapt-getして、入れる  
 
-サーバーを構築したとしても、セキュリティがガバガバではいろんな意味で駄目です。
-Webアプリケーションの脆弱性を突かれたり、設定したサーバーに脆弱性があったりした場合、
-情報漏洩とか乗っ取りとか踏み台とかされるとアレです。
-
-定期的にセキュリティチェックを行なう必要があります。
-
-(やり方は[別ページ](misc/SecurityScan.md))
-
-セキュリティチェックを行ない、不具合があるようでしたら修正を行なって再度セキュリティチェックを行ないます。
-(可能な限り不具合がなくなるまでチェック&fixを行ないます。)
+    ab http://アドレス/
