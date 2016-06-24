@@ -30,6 +30,8 @@ Vagrantfileがある場所に
 
 という構成
 
+[playbook](https://github.com/s14007/serverbuilding/tree/master/ansible_wordpress)
+
 hostsの中身はvagrantのIPアドレスだけ
 
 ansible-playbook途中でできなくても実行続けたりもあったから気づかないこと多かった
